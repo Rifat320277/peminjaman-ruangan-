@@ -396,7 +396,6 @@
             "<div><strong>Ruangan:</strong> " + escapeHTML(ROOM_NAMES[b.roomId] || b.roomName || b.roomId) + "</div>" +
             "<div><strong>Tanggal:</strong> " + escapeHTML(b.date) + " (" + escapeHTML((b.session||"").toUpperCase()) + ")</div>" +
             "<div><strong>Penanggung Jawab:</strong> " + escapeHTML(b.requesterName) + " (" + escapeHTML(b.unit) + ")</div>" +
-            "<div><strong>Nomor Kontak / WA:</strong> " + escapeHTML(b.phone || "-") + "</div>" +
             "<div><strong>Agenda:</strong> " + escapeHTML(b.purpose) + "</div>" +
           "</div>" +
           "<div style='margin-top:14px; padding:10px 12px; background:#f0fdfa; border:1px solid #ccfbf1; border-radius:6px; font-size:12px; color:#0f766e;'>" +
