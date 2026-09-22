@@ -5,8 +5,13 @@ const crypto = require("crypto");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DATA_FILE = path.join(__dirname, "data", "bookings.json");
-const ADMIN_PIN_FILE = path.join(__dirname, "data", "admin_config.json");
+const DATA_DIR = path.join(__dirname, "data");
+const DATA_FILE = path.join(DATA_DIR, "bookings.json");
+const ADMIN_PIN_FILE = path.join(DATA_DIR, "admin_config.json");
+
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
 
 // Default Admin PIN if not set
 const DEFAULT_ADMIN_PIN = "admin123";
@@ -397,12 +402,16 @@ app.post("/api/bookings", (req, res) => {
   withLock(() => {
     const body = req.body || {};
     const required = [
-      "roomId", "roomName", "requesterName", "unit", "phone",
+      "roomId", "roomName", "requesterName", "unit",
       "date", "startTime", "endTime"
     ];
     const missing = required.filter((k) => !body[k] && body[k] !== 0);
     if (missing.length) {
-      return res.status(400).json({ error: "missing_fields", fields: missing });
+      return res.status(400).json({
+        error: "missing_fields",
+        fields: missing,
+        message: "Data wajib belum lengkap: " + missing.join(", ")
+      });
     }
     if (body.endTime <= body.startTime) {
       return res.status(400).json({ error: "invalid_time_range", message: "Jam selesai harus setelah jam mulai." });
@@ -449,7 +458,7 @@ app.post("/api/bookings", (req, res) => {
       roomName: body.roomName,
       requesterName: body.requesterName.trim(),
       unit: body.unit.trim(),
-      phone: body.phone.trim(),
+      phone: (body.phone || "-").trim(),
       participants: Number(body.participants) || 1,
       date: body.date,
       session: session,

@@ -332,6 +332,7 @@
       var session = sessInput ? sessInput.value : "pagi";
       var requesterName = document.getElementById("f-pj").value.trim();
       var unit = document.getElementById("f-unit").value.trim();
+      var phone = document.getElementById("f-phone") ? document.getElementById("f-phone").value.trim() : "";
       var purpose = document.getElementById("f-purpose").value.trim();
       var notes = document.getElementById("f-notes").value.trim();
 
@@ -352,6 +353,7 @@
         endTime: endTime,
         requesterName: requesterName,
         unit: unit,
+        phone: phone || "-",
         purpose: purpose,
         notes: notes
       };
@@ -386,6 +388,7 @@
             "<div><strong>Ruangan:</strong> " + (ROOM_NAMES[b.roomId] || b.roomId) + "</div>" +
             "<div><strong>Tanggal:</strong> " + b.date + " (" + (b.session||"").toUpperCase() + ")</div>" +
             "<div><strong>Penanggung Jawab:</strong> " + escapeHTML(b.requesterName) + " (" + escapeHTML(b.unit) + ")</div>" +
+            "<div><strong>Nomor Kontak / WA:</strong> " + escapeHTML(b.phone || "-") + "</div>" +
             "<div><strong>Agenda:</strong> " + escapeHTML(b.purpose) + "</div>" +
           "</div>" +
           "<div style='margin-top:14px; padding:10px 12px; background:#f0fdfa; border:1px solid #ccfbf1; border-radius:6px; font-size:12px; color:#0f766e;'>" +
