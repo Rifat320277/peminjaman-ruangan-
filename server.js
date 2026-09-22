@@ -24,6 +24,8 @@ app.use(express.static(path.join(__dirname, "public"), {
 }));
 
 // ---------- File Storage Helpers ----------
+let inMemoryBookings = null;
+
 function getAdminPin() {
   try {
     if (fs.existsSync(ADMIN_PIN_FILE)) {
@@ -37,20 +39,43 @@ function getAdminPin() {
 }
 
 function saveAdminPin(newPin) {
-  fs.writeFileSync(ADMIN_PIN_FILE, JSON.stringify({ pin: newPin }, null, 2), "utf8");
-}
-
-function readBookings() {
   try {
-    const raw = fs.readFileSync(DATA_FILE, "utf8");
-    return JSON.parse(raw || "[]");
-  } catch (err) {
-    return [];
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    fs.writeFileSync(ADMIN_PIN_FILE, JSON.stringify({ pin: newPin }, null, 2), "utf8");
+  } catch (e) {
+    console.warn("Gagal menyimpan PIN ke file:", e.message);
   }
 }
 
+function readBookings() {
+  if (inMemoryBookings !== null && Array.isArray(inMemoryBookings) && inMemoryBookings.length > 0) {
+    return inMemoryBookings;
+  }
+  try {
+    if (fs.existsSync(DATA_FILE)) {
+      const raw = fs.readFileSync(DATA_FILE, "utf8");
+      inMemoryBookings = JSON.parse(raw || "[]");
+      return inMemoryBookings;
+    }
+  } catch (err) {
+    console.warn("Gagal membaca bookings.json:", err.message);
+  }
+  inMemoryBookings = inMemoryBookings || [];
+  return inMemoryBookings;
+}
+
 function writeBookings(bookings) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(bookings, null, 2), "utf8");
+  inMemoryBookings = bookings;
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    fs.writeFileSync(DATA_FILE, JSON.stringify(bookings, null, 2), "utf8");
+  } catch (err) {
+    console.warn("Gagal menyimpan ke file data (menggunakan memori):", err.message);
+  }
 }
 
 let writeLock = Promise.resolve();
@@ -402,87 +427,137 @@ app.get("/api/admin/bookings", (req, res) => {
 });
 
 // Create a booking (Accessible to both staff and admin)
+// Map nama ruangan resmi
+const ROOM_NAME_MAP = {
+  hypocrates: "HYPOCRATES",
+  arrozi: "AR ROZI",
+  aviecena: "AVIECENA"
+};
+
+// Create a booking (Accessible to both staff and admin)
 app.post("/api/bookings", (req, res) => {
   withLock(() => {
-    const body = req.body || {};
-    const required = [
-      "roomId", "roomName", "requesterName", "unit",
-      "date", "startTime", "endTime"
-    ];
-    const missing = required.filter((k) => !body[k] && body[k] !== 0);
-    if (missing.length) {
-      return res.status(400).json({
-        error: "missing_fields",
-        fields: missing,
-        message: "Data wajib belum lengkap: " + missing.join(", ")
+    try {
+      const body = req.body || {};
+
+      // Hanya validasi kolom utama yang krusial
+      const roomId = String(body.roomId || "").toLowerCase().trim();
+      const requesterName = String(body.requesterName || "").trim();
+      const unit = String(body.unit || "").trim();
+      const date = String(body.date || "").trim();
+
+      if (!roomId || !requesterName || !unit || !date) {
+        const missing = [];
+        if (!roomId) missing.push("Ruangan");
+        if (!requesterName) missing.push("Nama Penanggung Jawab");
+        if (!unit) missing.push("Bidang / Unit Kerja");
+        if (!date) missing.push("Tanggal Penggunaan");
+        return res.status(400).json({
+          error: "missing_fields",
+          message: "Data wajib belum lengkap: " + missing.join(", ")
+        });
+      }
+
+      // Auto-resolve nama ruangan
+      const roomName = body.roomName || ROOM_NAME_MAP[roomId] || roomId.toUpperCase();
+
+      // Auto-resolve sesi & jam penggunaan
+      let session = body.session;
+      if (!session) {
+        if (body.startTime <= "08:00" && body.endTime >= "16:00") session = "seharian";
+        else if (body.startTime && body.startTime >= "12:00") session = "siang";
+        else session = "pagi";
+      }
+
+      let startTime = body.startTime;
+      let endTime = body.endTime;
+      if (!startTime || !endTime) {
+        if (session === "pagi") {
+          startTime = "07:30";
+          endTime = "12:00";
+        } else if (session === "siang") {
+          startTime = "12:30";
+          endTime = "16:00";
+        } else {
+          startTime = "07:30";
+          endTime = "16:00";
+        }
+      }
+
+      if (endTime <= startTime) {
+        return res.status(400).json({
+          error: "invalid_time_range",
+          message: "Jam selesai harus setelah jam mulai."
+        });
+      }
+
+      const bookings = readBookings();
+
+      // Check bentrok jadwal
+      const clash = bookings.find(
+        (b) =>
+          (b.status === "aktif" || b.status === "menunggu") &&
+          b.roomId.toLowerCase() === roomId &&
+          b.date === date &&
+          overlaps(startTime, endTime, b.startTime, b.endTime)
+      );
+
+      if (clash) {
+        const clashMsg = clash.status === "menunggu"
+          ? `Ruangan ${roomName} pada tanggal ${date} sesi ${session} sedang dalam proses persetujuan admin.`
+          : `Ruangan ${roomName} pada tanggal ${date} sesi ${session} sudah terisi. Silakan pilih sesi atau ruangan lain.`;
+        return res.status(409).json({
+          error: "conflict",
+          message: clashMsg,
+          session: clash.session || "pagi"
+        });
+      }
+
+      const isAdmin = checkAdminAuth(req);
+      const initialStatus = isAdmin ? "aktif" : "menunggu";
+
+      const cleanDate = date.replace(/[^0-9]/g, "") || Date.now().toString();
+      const bookingId = "BK-" + cleanDate + "-" + Math.random().toString(36).substring(2, 6).toUpperCase();
+
+      const newBooking = {
+        id: bookingId,
+        roomId: roomId,
+        roomName: roomName,
+        requesterName: requesterName,
+        unit: unit,
+        phone: String(body.phone || "-").trim() || "-",
+        participants: Number(body.participants) || 1,
+        date: date,
+        session: session,
+        startTime: startTime,
+        endTime: endTime,
+        startDateTime: date + "T" + startTime,
+        purpose: String(body.purpose || unit || "Peminjaman Ruangan").trim(),
+        notes: String(body.notes || "").trim(),
+        status: initialStatus,
+        createdAt: new Date().toISOString()
+      };
+
+      bookings.push(newBooking);
+      writeBookings(bookings);
+
+      // Return booking yang berhasil dibuat
+      return res.status(201).json(newBooking);
+    } catch (innerErr) {
+      console.error("Booking error:", innerErr);
+      return res.status(500).json({
+        error: "server_error",
+        message: "Terjadi kesalahan saat menyimpan data: " + innerErr.message
       });
     }
-    if (body.endTime <= body.startTime) {
-      return res.status(400).json({ error: "invalid_time_range", message: "Jam selesai harus setelah jam mulai." });
-    }
-
-    const bookings = readBookings();
-
-    // Check collision for active or pending bookings on same room and date
-    const clash = bookings.find(
-      (b) =>
-        (b.status === "aktif" || b.status === "menunggu") &&
-        b.roomId === body.roomId &&
-        b.date === body.date &&
-        overlaps(body.startTime, body.endTime, b.startTime, b.endTime)
-    );
-
-    if (clash) {
-      const clashMsg = clash.status === "menunggu"
-        ? `Ruangan ${body.roomName} pada tanggal ${body.date} sesi ${body.session || "terpilih"} sedang dalam proses persetujuan admin.`
-        : `Ruangan ${body.roomName} pada tanggal ${body.date} pukul ${body.startTime}-${body.endTime} sudah terisi.`;
-      return res.status(409).json({
-        error: "conflict",
-        message: clashMsg,
-        session: clash.session || "pagi"
-      });
-    }
-
-    // Determine session tag (pagi / siang / full)
-    let session = body.session;
-    if (!session) {
-      if (body.startTime <= "08:00" && body.endTime >= "16:00") session = "seharian";
-      else if (body.startTime < "12:00") session = "pagi";
-      else session = "siang";
-    }
-
-    const isAdmin = checkAdminAuth(req);
-    const initialStatus = isAdmin ? "aktif" : "menunggu";
-
-    const bookingId = "BK-" + body.date.replace(/-/g, "") + "-" + Math.random().toString(36).substring(2, 6).toUpperCase();
-
-    const newBooking = {
-      id: bookingId,
-      roomId: body.roomId,
-      roomName: body.roomName,
-      requesterName: body.requesterName.trim(),
-      unit: body.unit.trim(),
-      phone: (body.phone || "-").trim(),
-      participants: Number(body.participants) || 1,
-      date: body.date,
-      session: session,
-      startTime: body.startTime,
-      endTime: body.endTime,
-      startDateTime: body.date + "T" + body.startTime,
-      purpose: (body.purpose || body.unit).trim(),
-      notes: (body.notes || "").trim(),
-      status: initialStatus,
-      createdAt: new Date().toISOString()
-    };
-
-    bookings.push(newBooking);
-    writeBookings(bookings);
-
-    // Return the created booking (safe for the creator's receipt)
-    res.status(201).json(newBooking);
   }).catch((err) => {
-    console.error(err);
-    res.status(500).json({ error: "server_error" });
+    console.error("Server Lock error:", err);
+    if (!res.headersSent) {
+      res.status(500).json({
+        error: "server_error",
+        message: "Terjadi gangguan sistem: " + (err && err.message ? err.message : "server_error")
+      });
+    }
   });
 });
 
@@ -635,6 +710,6 @@ app.get("/api/bookings/my-check", (req, res) => {
 });
 
 // General server start
-app.listen(PORT, () => {
-  console.log("Sistem Peminjaman Ruangan Dinkes Gresik berjalan di http://localhost:" + PORT);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log("Sistem Peminjaman Ruangan Dinkes Gresik berjalan di port " + PORT);
 });

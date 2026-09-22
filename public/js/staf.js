@@ -364,8 +364,17 @@
         body: JSON.stringify(payload)
       })
       .then(function(res){
-        return res.json().then(function(data){
-          if (!res.ok) throw new Error(data.message || "Gagal mengajukan peminjaman.");
+        return res.text().then(function(text){
+          var data;
+          try {
+            data = JSON.parse(text);
+          } catch(e) {
+            data = { message: "Gagal terhubung ke server (HTTP " + res.status + ")" };
+          }
+          if (!res.ok) {
+            var errMsg = data.message || data.error || ("Gagal mengajukan peminjaman (Status: " + res.status + ")");
+            throw new Error(errMsg);
+          }
           return data;
         });
       })
@@ -375,18 +384,17 @@
         loadBookings();
 
         // Tampilkan Resi Bukti Pengajuan
-        // Server mengembalikan booking object langsung (bukan {booking: ...})
         var b = result || {};
         var content = document.getElementById("receipt-content");
         content.innerHTML =
           "<div style='background:#fefce8; border:1px solid #fde68a; border-radius:8px; padding:14px; margin-bottom:16px;'>" +
             "<div style='font-size:12px; color:#92400e; font-weight:700;'>NOMOR RESI BOOKING</div>" +
-            "<div style='font-size:18px; font-weight:800; font-family:IBM Plex Mono, monospace; color:#b45309;'>" + b.id + "</div>" +
+            "<div style='font-size:18px; font-weight:800; font-family:IBM Plex Mono, monospace; color:#b45309;'>" + escapeHTML(b.id) + "</div>" +
             "<div style='font-size:12px; color:#b45309; margin-top:4px;'>⏳ Status: <strong>Menunggu Persetujuan Admin</strong></div>" +
           "</div>" +
           "<div style='font-size:13px; color:#334155; line-height:1.7;'>" +
-            "<div><strong>Ruangan:</strong> " + (ROOM_NAMES[b.roomId] || b.roomId) + "</div>" +
-            "<div><strong>Tanggal:</strong> " + b.date + " (" + (b.session||"").toUpperCase() + ")</div>" +
+            "<div><strong>Ruangan:</strong> " + escapeHTML(ROOM_NAMES[b.roomId] || b.roomName || b.roomId) + "</div>" +
+            "<div><strong>Tanggal:</strong> " + escapeHTML(b.date) + " (" + escapeHTML((b.session||"").toUpperCase()) + ")</div>" +
             "<div><strong>Penanggung Jawab:</strong> " + escapeHTML(b.requesterName) + " (" + escapeHTML(b.unit) + ")</div>" +
             "<div><strong>Nomor Kontak / WA:</strong> " + escapeHTML(b.phone || "-") + "</div>" +
             "<div><strong>Agenda:</strong> " + escapeHTML(b.purpose) + "</div>" +
@@ -399,6 +407,7 @@
         showToast("Pengajuan peminjaman berhasil dikirim! Menunggu persetujuan admin.", "success");
       })
       .catch(function(err){
+        console.error("Submit booking error:", err);
         showToast(err.message, "error");
       })
       .finally(function(){
