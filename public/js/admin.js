@@ -94,8 +94,8 @@
       headers: { "x-admin-token": adminToken }
     })
     .then(function(res){
-      if (res.status === 401) {
-        // Token kadaluarsa
+      if (res.status === 403) {
+        // Token kadaluarsa / tidak valid
         adminToken = "";
         localStorage.removeItem("dinkes_admin_token");
         checkAuthUI();
@@ -515,7 +515,7 @@
           "Content-Type": "application/json",
           "x-admin-token": adminToken
         },
-        body: JSON.stringify({ currentPin: currentPin, newPin: newPin })
+        body: JSON.stringify({ oldPin: currentPin, newPin: newPin })
       })
       .then(function(res){
         return res.json().then(function(data){

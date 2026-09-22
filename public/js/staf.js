@@ -373,7 +373,8 @@
         loadBookings();
 
         // Tampilkan Resi Bukti Pengajuan
-        var b = result.booking || {};
+        // Server mengembalikan booking object langsung (bukan {booking: ...})
+        var b = result || {};
         var content = document.getElementById("receipt-content");
         content.innerHTML =
           "<div style='background:#fefce8; border:1px solid #fde68a; border-radius:8px; padding:14px; margin-bottom:16px;'>" +
