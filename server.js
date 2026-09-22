@@ -17,7 +17,11 @@ if (!fs.existsSync(DATA_DIR)) {
 const DEFAULT_ADMIN_PIN = "admin123";
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public"), {
+  setHeaders: (res) => {
+    res.set("Cache-Control", "no-cache, no-store, must-revalidate");
+  }
+}));
 
 // ---------- File Storage Helpers ----------
 function getAdminPin() {
