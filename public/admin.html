@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dashboard Admin Pengelola — Sistem Peminjaman Ruang Dinkes Gresik</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tema.css">
+<link rel="stylesheet" href="css/staf.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- Header Dinkes -->
+<header class="dinkes-header-top">
+  <div class="header-inner">
+    <a href="index.html" class="brand-group">
+      <div class="brand-logo-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v20M2 12h20"/>
+          <circle cx="12" cy="12" r="9"/>
+        </svg>
+      </div>
+      <div class="brand-title-area">
+        <h1>Dinas Kesehatan Kabupaten Gresik</h1>
+        <p>Dashboard Pengelola Ruang Rapat</p>
+      </div>
+    </a>
+
+    <div class="header-actions">
+      <div class="role-indicator admin">
+        <span class="dot"></span>
+        <span>Mode Admin Pengelola</span>
+      </div>
+
+      <a href="index.html" class="btn btn-outline">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        <span>Lihat Halaman Staf</span>
+      </a>
+
+      <button class="btn btn-outline" onclick="openModal('modal-change-pin')" title="Ubah PIN Admin">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span>Ganti PIN</span>
+      </button>
+
+      <button class="btn btn-white" id="btn-admin-logout" style="display:none;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Keluar</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Kunci Layar / Form Login Admin (Jika Belum Login) -->
+<div id="admin-lock-screen" class="admin-lock-screen" style="display:none;">
+  <div class="admin-lock-icon">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+  </div>
+  <h2 style="font-size:18px; font-weight:800; color:var(--ink); margin-bottom:6px;">Login Pengelola Ruangan</h2>
+  <p style="font-size:13px; color:var(--ink-soft); margin-bottom:20px;">Masukkan PIN Admin untuk mengakses persetujuan dan pengelolaan jadwal ruangan.</p>
+
+  <form id="form-admin-login">
+    <div class="form-control" style="text-align:left;">
+      <label for="admin-pin-input">PIN Admin <span class="req">*</span></label>
+      <input type="password" id="admin-pin-input" class="form-input" placeholder="Masukkan PIN (Default: admin123)" required autofocus>
+      <div style="font-size:11.5px; color:var(--ink-faint); margin-top:4px;">PIN bawaan sistem: <code>admin123</code></div>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:16px;">
+      <a href="index.html" class="btn btn-outline-dark" style="flex:1;">Kembali</a>
+      <button type="submit" class="btn btn-primary" style="flex:1;">Masuk</button>
+    </div>
+  </form>
+</div>
+
+<!-- Konten Dashboard Admin (Setelah Login) -->
+<main id="admin-dashboard-content" class="content-wrapper" style="display:none;">
+
+  <div class="admin-badge-banner">
+    <div>
+      <strong>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Panel Pengelola Ruangan Aktif
+      </strong>
+      — Seluruh data peminjam ditampilkan secara transparan. Klik pada jadwal yang terisi untuk melihat detail atau membatalkan.
+    </div>
+  </div>
+
+  <!-- Panel Permintaan Menunggu Persetujuan Admin -->
+  <div class="pending-panel" id="pending-panel">
+    <div class="pending-panel-header">
+      <h3>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Permintaan Peminjaman Menunggu Persetujuan Admin
+      </h3>
+      <span class="pending-count-badge" id="pending-count">0</span>
+    </div>
+    <div class="pending-list" id="pending-list">
+      <div class="pending-empty">Tidak ada permintaan yang menunggu persetujuan.</div>
+    </div>
+  </div>
+
+  <!-- Sheet Toolbar (Kalender Pemilih Tanggal & Tombol Aksi) -->
+  <div class="sheet-toolbar">
+    <div class="month-picker-container">
+      <label for="picker-schedule-date" class="month-picker-label">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Pilih Tanggal:</span>
+      </label>
+      <input type="date" id="picker-schedule-date" class="month-picker-date" title="Klik untuk membuka kalender, pilih tanggal, bulan, dan tahun">
+      <div class="month-nav-btns">
+        <button type="button" class="month-nav-btn" id="btn-prev-month" title="Bulan Sebelumnya">◀</button>
+        <button type="button" class="month-nav-btn" id="btn-next-month" title="Bulan Selanjutnya">▶</button>
+        <button type="button" class="month-nav-btn" id="btn-today-quick" title="Lompat ke Hari Ini" style="font-size:12px; font-weight:600; padding:6px 10px;">Hari Ini</button>
+      </div>
+    </div>
+
+    <div class="table-actions">
+      <button class="btn btn-outline-dark btn-sm" id="btn-print-schedule" title="Cetak jadwal">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        <span>Cetak Jadwal</span>
+      </button>
+
+      <button class="btn btn-outline-dark btn-sm" id="btn-export-spreadsheet" title="Unduh Lembar Kerja Spreadsheet Excel Lengkap Resmi Dinas">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span style="color:#0f766e; font-weight:700;">Ekspor Spreadsheet (Lengkap)</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Container Spreadsheet Jadwal Lengkap -->
+  <div class="sheet-container">
+    <div class="sheet-table-header-title">
+      <h2>DAFTAR PEMINJAMAN RUANG (DATA LENGKAP PENGELOLA)</h2>
+      <h3>DINAS KESEHATAN KABUPATEN GRESIK</h3>
+      <div class="subnotes">
+        <span id="label-active-month">Bulan September 2026</span>
+        <span>&bull;</span>
+        <span>Waktu Penggunaan: Pagi, Siang, dan Seharian</span>
+        <span>&bull;</span>
+        <span style="color:#0f766e; font-weight:600;">Status: Transparan (Nama &amp; Kegiatan)</span>
+      </div>
+    </div>
+
+    <div class="table-scroll-area">
+      <table class="matrix-table" id="schedule-matrix-table">
+        <thead>
+          <tr class="group-header">
+            <th rowspan="2" class="col-tgl">Tanggal</th>
+            <th rowspan="2" class="col-waktu">Waktu</th>
+            <th colspan="2" style="background:#047857; color:#ffffff;">HYPOCRATES</th>
+            <th colspan="2" style="background:#0f766e; color:#ffffff;">AR ROZI</th>
+            <th colspan="2" style="background:#0e7490; color:#ffffff;">AVIECENA</th>
+          </tr>
+          <tr class="sub-header">
+            <th>Kegiatan / Unit</th>
+            <th>Penanggung Jawab</th>
+            <th>Kegiatan / Unit</th>
+            <th>Penanggung Jawab</th>
+            <th>Kegiatan / Unit</th>
+            <th>Penanggung Jawab</th>
+          </tr>
+        </thead>
+        <tbody id="matrix-tbody">
+          <!-- Injected via JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<!-- MODAL: DETAIL BOOKING ADMIN -->
+<div class="modal-backdrop" id="modal-detail">
+  <div class="modal-dialog">
+    <div class="modal-head">
+      <h3 id="modal-detail-title">Rincian Peminjaman Ruangan</h3>
+      <button class="modal-close" data-close>&times;</button>
+    </div>
+    <div class="modal-body" id="modal-detail-body">
+      <!-- Injected detail info -->
+    </div>
+    <div class="modal-foot" id="modal-detail-actions">
+      <!-- Action buttons -->
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: GANTI PIN ADMIN -->
+<div class="modal-backdrop" id="modal-change-pin">
+  <div class="modal-dialog" style="max-width: 400px;">
+    <div class="modal-head">
+      <h3>Ubah PIN Admin</h3>
+      <button class="modal-close" data-close>&times;</button>
+    </div>
+    <form id="form-change-pin">
+      <div class="modal-body">
+        <div class="form-control">
+          <label for="pin-current">PIN Saat Ini <span class="req">*</span></label>
+          <input type="password" id="pin-current" class="form-input" placeholder="Masukkan PIN lama" required>
+        </div>
+        <div class="form-control">
+          <label for="pin-new">PIN Baru <span class="req">*</span></label>
+          <input type="password" id="pin-new" class="form-input" placeholder="Masukkan PIN baru minimal 4 karakter" required>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" data-close>Batal</button>
+        <button type="submit" class="btn btn-primary">Simpan PIN Baru</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Skrip Terpisah -->
+<script src="js/utilitas.js"></script>
+<script src="js/admin.js"></script>
+
+</body>
+</html>

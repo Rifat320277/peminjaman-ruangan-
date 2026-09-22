@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sistem Peminjaman Ruang — Dinas Kesehatan Kabupaten Gresik</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tema.css">
+<link rel="stylesheet" href="css/staf.css">
+</head>
+<body>
+
+<!-- Header Dinkes -->
+<header class="dinkes-header-top">
+  <div class="header-inner">
+    <div class="brand-group">
+      <div class="brand-logo-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v20M2 12h20"/>
+          <circle cx="12" cy="12" r="9"/>
+        </svg>
+      </div>
+      <div class="brand-title-area">
+        <h1>Dinas Kesehatan Kabupaten Gresik</h1>
+        <p>Sistem Informasi Peminjaman Ruang Rapat</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="role-indicator">
+        <span class="dot"></span>
+        <span>Tampilan Publik / Staf</span>
+      </div>
+
+      <a href="admin.html" class="btn btn-white" id="btn-admin-portal" title="Buka Portal Admin Pengelola">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span>Portal Admin</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- Sub-Header Pengumuman & Kontak PIC -->
+<div class="official-notice-bar">
+  <div class="notice-container">
+    <div class="notice-left">
+      <div class="pic-contact-box">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <span>NB: Peminjaman Ruangan dapat menghubungi <strong>Mbak Lisa</strong> dan <strong>Mas Mudzakir</strong></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Navigasi Tab Staf -->
+<nav class="main-nav-bar">
+  <div class="nav-inner">
+    <div class="nav-tabs">
+      <button class="tab-btn active" data-target="tab-jadwal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Tabel Jadwal Ruangan</span>
+      </button>
+
+      <button class="tab-btn" data-target="tab-ajukan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        <span>Formulir Peminjaman</span>
+      </button>
+
+
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="content-wrapper">
+
+  <!-- TAB 1: TABEL JADWAL RUANGAN (Format Google Sheets) -->
+  <section id="tab-jadwal" class="tab-section">
+
+    <!-- Sheet Toolbar (Pilihan Kalender / Tanggal & Action Buttons) -->
+    <div class="sheet-toolbar">
+      <div class="month-picker-container">
+        <label for="picker-schedule-date" class="month-picker-label">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>Pilih Tanggal:</span>
+        </label>
+        <input type="date" id="picker-schedule-date" class="month-picker-date" title="Klik untuk membuka kalender, pilih tanggal, bulan, dan tahun">
+        <div class="month-nav-btns">
+          <button type="button" class="month-nav-btn" id="btn-prev-month" title="Bulan Sebelumnya">◀</button>
+          <button type="button" class="month-nav-btn" id="btn-next-month" title="Bulan Selanjutnya">▶</button>
+          <button type="button" class="month-nav-btn" id="btn-today-quick" title="Lompat ke Hari Ini" style="font-size:12px; font-weight:600; padding:6px 10px;">Hari Ini</button>
+        </div>
+      </div>
+
+      <div class="table-actions">
+        <button class="btn btn-outline-dark btn-sm" id="btn-print-schedule" title="Cetak jadwal">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          <span>Cetak Jadwal</span>
+        </button>
+
+        <button class="btn btn-outline-dark btn-sm" id="btn-export-spreadsheet" title="Unduh Lembar Kerja Spreadsheet Excel">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <span style="color:#0f766e; font-weight:700;">Ekspor Spreadsheet</span>
+        </button>
+
+        <button class="btn btn-primary btn-sm" id="btn-quick-book">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Pinjam Ruangan</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Container Spreadsheet -->
+    <div class="sheet-container">
+      <div class="sheet-table-header-title">
+        <h2>DAFTAR PEMINJAMAN RUANG</h2>
+        <h3>DINAS KESEHATAN KABUPATEN GRESIK</h3>
+        <div class="subnotes">
+          <span id="label-active-month">Bulan September 2026</span>
+          <span>&bull;</span>
+          <span>Waktu Penggunaan: Pagi, Siang, dan Seharian</span>
+        </div>
+      </div>
+
+      <div class="table-scroll-area">
+        <table class="matrix-table" id="schedule-matrix-table">
+          <thead>
+            <tr class="group-header">
+              <th rowspan="2" class="col-tgl">Tanggal</th>
+              <th rowspan="2" class="col-waktu">Waktu</th>
+              <th colspan="2" style="background:#047857; color:#ffffff;">HYPOCRATES</th>
+              <th colspan="2" style="background:#0f766e; color:#ffffff;">AR ROZI</th>
+              <th colspan="2" style="background:#0e7490; color:#ffffff;">AVIECENA</th>
+            </tr>
+            <tr class="sub-header">
+              <th>Kegiatan / Unit</th>
+              <th>Penanggung Jawab</th>
+              <th>Kegiatan / Unit</th>
+              <th>Penanggung Jawab</th>
+              <th>Kegiatan / Unit</th>
+              <th>Penanggung Jawab</th>
+            </tr>
+          </thead>
+          <tbody id="matrix-tbody">
+            <!-- Injected via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Informasi Kebijakan Privasi Staf -->
+    <div class="privacy-info-box" id="privacy-box-staff">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <div>
+        <strong>Kebijakan Privasi Peminjaman:</strong> Pada tampilan Staf / Publik, sistem hanya menampilkan status ketersediaan (<em>Tersedia</em> / <em>Terisi</em>) demi menjaga privasi dan ketertiban. Rincian peminjam dapat dipantau oleh <strong>Admin Pengelola Ruangan</strong> di <a href="admin.html" style="color:#0f766e; font-weight:700; text-decoration:underline;">Portal Admin</a>. Baris berwarna kuning menandakan akhir pekan (Sabtu &amp; Minggu).
+      </div>
+    </div>
+
+  </section>
+
+  <!-- TAB 2: FORMULIR PENGAJUAN PEMINJAMAN -->
+  <section id="tab-ajukan" class="tab-section" style="display:none;">
+    <div class="form-card">
+      <div class="form-card-head">
+        <h2>Formulir Peminjaman Ruang</h2>
+        <p>Silakan lengkapi formulir di bawah ini. Pastikan ruangan dan sesi waktu yang dipilih masih berstatus <strong>Tersedia</strong>.</p>
+      </div>
+
+      <form id="form-booking">
+        <!-- 1. Pilih Ruangan -->
+        <div class="form-group-title">1. Pilih Ruangan Rapat</div>
+        <div class="room-select-grid" id="room-selection-cards">
+          <div class="room-card-option selected" data-room="hypocrates">
+            <div class="room-card-title">
+              <span>HYPOCRATES</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+
+          <div class="room-card-option" data-room="arrozi">
+            <div class="room-card-title">
+              <span>AR ROZI</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+
+          <div class="room-card-option" data-room="aviecena">
+            <div class="room-card-title">
+              <span>AVIECENA</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="f-room" value="hypocrates">
+
+        <!-- 2. Waktu Penggunaan -->
+        <div class="form-group-title">2. Tanggal &amp; Sesi Waktu</div>
+        <div class="grid-2">
+          <div class="form-control">
+            <label for="f-date">Tanggal Penggunaan <span class="req">*</span></label>
+            <input type="date" id="f-date" class="form-input" required>
+          </div>
+
+          <div class="form-control">
+            <label>Pilihan Sesi Penggunaan <span class="req">*</span></label>
+            <div class="session-radio-group">
+              <label class="session-radio-btn checked">
+                <input type="radio" name="session-radio" value="pagi" checked>
+                <div class="s-title">Pagi</div>
+              </label>
+
+              <label class="session-radio-btn">
+                <input type="radio" name="session-radio" value="siang">
+                <div class="s-title">Siang</div>
+              </label>
+
+              <label class="session-radio-btn">
+                <input type="radio" name="session-radio" value="seharian">
+                <div class="s-title">Seharian</div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div id="conflict-live-alert" style="display:none; margin-bottom: 16px; padding: 12px; background: #fee2e2; border-left: 4px solid #ef4444; border-radius: 4px; color: #991b1b; font-size: 13px;">
+          Ruangan ini sudah terisi pada tanggal dan sesi yang Anda pilih. Silakan pilih sesi atau ruangan lain.
+        </div>
+
+        <!-- 3. Identitas Peminjam -->
+        <div class="form-group-title">3. Data Pemohon &amp; Penanggung Jawab</div>
+        <div class="grid-2">
+          <div class="form-control">
+            <label for="f-pj">Nama Penanggung Jawab <span class="req">*</span></label>
+            <input type="text" id="f-pj" class="form-input" required>
+          </div>
+
+          <div class="form-control">
+            <label for="f-unit">Bidang / Unit Kerja <span class="req">*</span></label>
+            <input type="text" id="f-unit" class="form-input" required>
+          </div>
+        </div>
+
+
+
+        <div class="form-control">
+          <label for="f-purpose">Nama Kegiatan / Agenda Rapat <span class="req">*</span></label>
+          <input type="text" id="f-purpose" class="form-input" required>
+        </div>
+
+        <div class="form-control">
+          <label for="f-notes">Catatan Tambahan / Perlengkapan Khusus</label>
+          <textarea id="f-notes" class="form-textarea"></textarea>
+        </div>
+
+        <div style="display:flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="reset" class="btn btn-ghost">Reset Formulir</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-booking">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Kirim Pengajuan Peminjaman</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+
+
+</main>
+
+<!-- MODAL: RESI TIKET PENGAJUAN -->
+<div class="modal-backdrop" id="modal-receipt">
+  <div class="modal-dialog" style="max-width: 480px;">
+    <div class="modal-head" style="background:#fefce8;">
+      <h3 style="color:#92400e; display:flex; align-items:center; gap:6px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Peminjaman Menunggu Persetujuan Admin
+      </h3>
+      <button class="modal-close" data-close>&times;</button>
+    </div>
+    <div class="modal-body" id="receipt-content">
+      <!-- Info Resi -->
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn btn-primary" data-close>Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Skrip Terpisah -->
+<script src="js/utilitas.js"></script>
+<script src="js/staf.js"></script>
+
+</body>
+</html>

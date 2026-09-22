@@ -1,0 +1,175 @@
+/* ==========================================================================
+   GAYA TAMPILAN ADMIN — PANEL PERSETUJUAN & PENGELOLAAN
+   ========================================================================== */
+
+/* Panel Permintaan Menunggu Persetujuan Admin */
+.pending-panel {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-bottom: 22px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.pending-panel-header {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #fff;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pending-panel-header h3 {
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pending-count-badge {
+  background: #fff;
+  color: #d97706;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 12px;
+  min-width: 24px;
+  text-align: center;
+}
+.pending-list {
+  padding: 0;
+  max-height: 420px;
+  overflow-y: auto;
+}
+.pending-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+.pending-item:last-child { border-bottom: none; }
+.pending-item:hover { background: #fffbeb; }
+.pending-item-info {
+  flex: 1;
+  min-width: 0;
+}
+.pending-item-room {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+.pending-item-detail {
+  font-size: 12px;
+  color: var(--ink-soft);
+  line-height: 1.4;
+  margin-top: 3px;
+}
+.pending-item-detail strong {
+  color: var(--ink);
+}
+.pending-item-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.btn-approve {
+  background: #059669;
+  color: #fff;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.btn-approve:hover { background: #047857; }
+.btn-reject {
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.btn-reject:hover { background: #b91c1c; }
+.pending-empty {
+  text-align: center;
+  padding: 24px;
+  color: var(--ink-faint);
+  font-size: 13px;
+}
+
+/* Sel Data di Mode Admin */
+.admin-cell-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.admin-cell-unit {
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+.admin-cell-pj {
+  font-size: 11.5px;
+  color: #475569;
+  font-weight: 500;
+}
+
+/* Box Notifikasi Mode Admin */
+.admin-badge-banner {
+  margin-bottom: 18px;
+  padding: 12px 18px;
+  background: #fefce8;
+  border: 1px solid #fef08a;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: #854d0e;
+  font-size: 13px;
+}
+.admin-badge-banner strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Modal Login Kunci Layar */
+.admin-lock-screen {
+  max-width: 420px;
+  margin: 60px auto;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 32px;
+  box-shadow: var(--shadow-md);
+  text-align: center;
+}
+.admin-lock-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary-tint);
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
