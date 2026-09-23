@@ -335,7 +335,7 @@
     var body = document.getElementById("modal-detail-body");
     var actions = document.getElementById("modal-detail-actions");
 
-    title.textContent = "Detail: " + (ROOM_NAMES[b.roomId] || b.roomId);
+    title.textContent = "Detail Peminjaman — " + (ROOM_NAMES[b.roomId] || b.roomId);
 
     var statusBadge = "<span class='badge-slot available'>Disetujui / Aktif</span>";
     if (b.status === "menunggu") {
@@ -343,8 +343,7 @@
     }
 
     body.innerHTML =
-      "<div style='margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;'>" +
-        "<span style='font-family:IBM Plex Mono, monospace; font-weight:700; color:#0f766e;'>" + b.id + "</span>" +
+      "<div style='margin-bottom: 14px;'>" +
         statusBadge +
       "</div>" +
       "<table style='width:100%; border:none; font-size:13px; line-height:1.8;'>" +
