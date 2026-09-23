@@ -140,9 +140,7 @@
         "<div class='pending-item-room'>📍 " + (ROOM_NAMES[b.roomId] || b.roomId) + " &bull; " + b.date + " (" + (b.session||"").toUpperCase() + ")</div>" +
         "<div class='pending-item-detail'>" +
           "<strong>Penanggung Jawab:</strong> " + escapeHTML(b.requesterName) + " (" + escapeHTML(b.unit) + ") &bull; " +
-          "<strong>HP:</strong> " + escapeHTML(b.phone || "-") + " &bull; " +
-          "<strong>Peserta:</strong> " + (b.participants || "-") + " orang<br>" +
-          "<strong>Kegiatan:</strong> " + escapeHTML(b.purpose) +
+          "<strong>Agenda:</strong> " + escapeHTML(b.purpose) +
           (b.notes ? "<br><em>Catatan: " + escapeHTML(b.notes) + "</em>" : "") +
         "</div>";
 
@@ -310,10 +308,10 @@
           tdKegiatan.style.background = "#fef3c7";
           tdPJ.style.background = "#fef3c7";
           tdKegiatan.innerHTML = "<div class='admin-cell-content'><span style='color:#b45309; font-weight:700;'>⏳ [MENUNGGU]</span><span class='admin-cell-unit'>" + escapeHTML(booking.purpose || booking.unit) + "</span></div>";
-          tdPJ.innerHTML = "<div class='admin-cell-pj'>" + escapeHTML(booking.requesterName) + "<br><small style='color:#64748b;'>" + escapeHTML(booking.phone || "") + "</small></div>";
+          tdPJ.innerHTML = "<div class='admin-cell-pj'>" + escapeHTML(booking.requesterName) + "<br><small style='color:#64748b;'>" + escapeHTML(booking.unit || "") + "</small></div>";
         } else {
           tdKegiatan.innerHTML = "<div class='admin-cell-content'><span class='admin-cell-unit'>" + escapeHTML(booking.purpose || booking.unit) + "</span></div>";
-          tdPJ.innerHTML = "<div class='admin-cell-pj'>" + escapeHTML(booking.requesterName) + "<br><small style='color:#64748b;'>" + escapeHTML(booking.phone || "") + "</small></div>";
+          tdPJ.innerHTML = "<div class='admin-cell-pj'>" + escapeHTML(booking.requesterName) + "<br><small style='color:#64748b;'>" + escapeHTML(booking.unit || "") + "</small></div>";
         }
 
         tdKegiatan.style.cursor = "pointer";
@@ -353,8 +351,6 @@
         "<tr><td style='width:140px; color:#64748b; border:none;'>Tanggal:</td><td style='border:none; font-weight:600;'>" + b.date + " (" + (b.session||"").toUpperCase() + ")</td></tr>" +
         "<tr><td style='color:#64748b; border:none;'>Penanggung Jawab:</td><td style='border:none; font-weight:600;'>" + escapeHTML(b.requesterName) + "</td></tr>" +
         "<tr><td style='color:#64748b; border:none;'>Bidang / Unit:</td><td style='border:none;'>" + escapeHTML(b.unit) + "</td></tr>" +
-        "<tr><td style='color:#64748b; border:none;'>Nomor WhatsApp:</td><td style='border:none;'><a href='tel:" + escapeHTML(b.phone) + "'>" + escapeHTML(b.phone) + "</a></td></tr>" +
-        "<tr><td style='color:#64748b; border:none;'>Jumlah Peserta:</td><td style='border:none;'>" + (b.participants || "-") + " orang</td></tr>" +
         "<tr><td style='color:#64748b; border:none;'>Agenda Rapat:</td><td style='border:none; font-weight:600;'>" + escapeHTML(b.purpose) + "</td></tr>" +
         (b.notes ? "<tr><td style='color:#64748b; border:none;'>Catatan:</td><td style='border:none; font-style:italic;'>" + escapeHTML(b.notes) + "</td></tr>" : "") +
       "</table>";

@@ -111,14 +111,14 @@ function exportSpreadsheet(fullDetails, currentYear, currentMonth, bookingsData)
     '<x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>' +
     '</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' +
     '<style>' +
-    'table { border-collapse: collapse; font-family: Arial, sans-serif; font-size: 10pt; }' +
+    'table { border-collapse: collapse; font-family: "Times New Roman", Times, serif; font-size: 12pt; }' +
     'th, td { border: 1px solid #000000; padding: 5px 8px; vertical-align: middle; }' +
-    '.title-1 { font-size: 14pt; font-weight: bold; text-align: center; border: none; }' +
-    '.title-2 { font-size: 12pt; font-weight: bold; text-align: center; border: none; }' +
-    '.sub-note { font-size: 10pt; border: none; }' +
+    '.title-1 { font-size: 16pt; font-weight: bold; text-align: center; border: none; }' +
+    '.title-2 { font-size: 14pt; font-weight: bold; text-align: center; border: none; }' +
+    '.sub-note { font-size: 12pt; border: none; }' +
     '.th-group { background-color: #CBD5E1; font-weight: bold; text-align: center; }' +
-    '.th-room { background-color: #E2E8F0; font-weight: bold; text-align: center; font-size: 10.5pt; }' +
-    '.th-sub { background-color: #F1F5F9; font-weight: bold; text-align: center; font-size: 9.5pt; }' +
+    '.th-room { background-color: #E2E8F0; font-weight: bold; text-align: center; font-size: 12pt; }' +
+    '.th-sub { background-color: #F1F5F9; font-weight: bold; text-align: center; font-size: 12pt; }' +
     '.weekend-bg { background-color: #FFFF00 !important; }' +
     '.text-center { text-align: center; }' +
     '.text-bold { font-weight: bold; }' +

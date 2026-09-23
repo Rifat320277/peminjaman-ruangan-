@@ -1,37 +1,5 @@
 [
   {
-    "id": "bkg-2026-09-01-hypo",
-    "roomId": "hypocrates",
-    "roomName": "HYPOCRATES",
-    "requesterName": "M. Mey",
-    "unit": "Kesmas QIC",
-    "phone": "081234567890",
-    "participants": 25,
-    "date": "2026-09-01",
-    "session": "pagi",
-    "startTime": "07:30",
-    "endTime": "12:00",
-    "purpose": "Kesmas QIC",
-    "status": "aktif",
-    "createdAt": "2026-08-25T08:00:00.000Z"
-  },
-  {
-    "id": "bkg-2026-09-01-arrozi",
-    "roomId": "arrozi",
-    "roomName": "AR ROZI",
-    "requesterName": "M. Yuli",
-    "unit": "Kesmas",
-    "phone": "081234567891",
-    "participants": 20,
-    "date": "2026-09-01",
-    "session": "pagi",
-    "startTime": "07:30",
-    "endTime": "12:00",
-    "purpose": "Kesmas",
-    "status": "aktif",
-    "createdAt": "2026-08-25T08:30:00.000Z"
-  },
-  {
     "id": "bkg-2026-09-02-hypo",
     "roomId": "hypocrates",
     "roomName": "HYPOCRATES",

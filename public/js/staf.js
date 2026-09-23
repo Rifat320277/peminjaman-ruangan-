@@ -388,9 +388,7 @@
         var content = document.getElementById("receipt-content");
         content.innerHTML =
           "<div style='background:#fefce8; border:1px solid #fde68a; border-radius:8px; padding:14px; margin-bottom:16px;'>" +
-            "<div style='font-size:12px; color:#92400e; font-weight:700;'>NOMOR RESI BOOKING</div>" +
-            "<div style='font-size:18px; font-weight:800; font-family:IBM Plex Mono, monospace; color:#b45309;'>" + escapeHTML(b.id) + "</div>" +
-            "<div style='font-size:12px; color:#b45309; margin-top:4px;'>⏳ Status: <strong>Menunggu Persetujuan Admin</strong></div>" +
+            "<div style='font-size:14px; color:#b45309; font-weight:600;'>⏳ Status: <strong>Menunggu Persetujuan Admin</strong></div>" +
           "</div>" +
           "<div style='font-size:13px; color:#334155; line-height:1.7;'>" +
             "<div><strong>Ruangan:</strong> " + escapeHTML(ROOM_NAMES[b.roomId] || b.roomName || b.roomId) + "</div>" +

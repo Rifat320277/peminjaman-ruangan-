@@ -694,6 +694,41 @@ app.post("/api/admin/cancel-booking", (req, res) => {
   });
 });
 
+// Admin batalkan peminjaman atas permintaan staf (status berubah jadi dibatalkan, slot ruangan bebas kembali)
+app.post("/api/admin/bookings/:id/cancel-by-staff", (req, res) => {
+  if (!checkAdminAuth(req)) {
+    return res.status(403).json({ error: "unauthorized", message: "Akses hanya untuk Admin Pengelola." });
+  }
+  withLock(() => {
+    const bookings = readBookings();
+    const idx = bookings.findIndex((b) => b.id === req.params.id);
+    if (idx === -1) {
+      return res.status(404).json({ error: "not_found", message: "Jadwal peminjaman tidak ditemukan." });
+    }
+    const reason = (req.body && req.body.reason ? req.body.reason.trim() : "") || "Dibatalkan atas permintaan staf/pemohon";
+    bookings[idx].status = "dibatalkan";
+    bookings[idx].cancelledBy = "Staf";
+    bookings[idx].cancelReason = reason;
+    bookings[idx].cancelledAt = new Date().toISOString();
+
+    writeBookings(bookings);
+    res.json({
+      success: true,
+      booking: bookings[idx],
+      message: "Jadwal berhasil dibatalkan atas permintaan staf. Ruangan sekarang kembali tersedia."
+    });
+  }).catch((err) => {
+    console.error(err);
+    res.status(500).json({ error: "server_error", message: "Gagal membatalkan: " + err.message });
+  });
+});
+
+app.post("/api/admin/cancel-by-staff", (req, res) => {
+  const { bookingId } = req.body || {};
+  req.params.id = bookingId;
+  return app._router.handle(req, res, () => {});
+});
+
 // Staff Verify / Track own booking by Booking ID or Phone
 app.get("/api/bookings/my-check", (req, res) => {
   const query = (req.query.q || "").trim().toLowerCase();
