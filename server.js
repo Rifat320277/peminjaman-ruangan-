@@ -56,7 +56,8 @@ function readBookings() {
   try {
     if (fs.existsSync(DATA_FILE)) {
       const raw = fs.readFileSync(DATA_FILE, "utf8");
-      inMemoryBookings = JSON.parse(raw || "[]");
+      const list = JSON.parse(raw || "[]");
+      inMemoryBookings = list.filter((b) => b && (b.status === "aktif" || b.status === "menunggu"));
       return inMemoryBookings;
     }
   } catch (err) {
@@ -358,23 +359,22 @@ app.post("/api/admin/bookings/:id/approve", (req, res) => {
   });
 });
 
-// Admin Reject a booking
+// Admin Reject a booking (Hapus permanen dari sistem)
 app.post("/api/admin/bookings/:id/reject", (req, res) => {
   if (!checkAdminAuth(req)) {
     return res.status(403).json({ error: "unauthorized" });
   }
 
   withLock(() => {
-    const bookings = readBookings();
+    let bookings = readBookings();
     const idx = bookings.findIndex((b) => b.id === req.params.id);
     if (idx === -1) {
-      return res.status(404).json({ error: "not_found" });
+      return res.status(404).json({ error: "not_found", message: "Data peminjaman tidak ditemukan." });
     }
 
-    bookings[idx].status = "ditolak";
-    bookings[idx].rejectedAt = new Date().toISOString();
+    const removed = bookings.splice(idx, 1);
     writeBookings(bookings);
-    res.json({ success: true, booking: bookings[idx] });
+    res.json({ success: true, removed: removed[0], message: "Peminjaman telah ditolak dan dihapus secara permanen." });
   }).catch((err) => {
     console.error(err);
     res.status(500).json({ error: "server_error" });
@@ -436,28 +436,23 @@ app.post("/api/admin/cancel-booking", (req, res) => {
   });
 });
 
-// Admin batalkan peminjaman atas permintaan staf (status berubah jadi dibatalkan, slot ruangan bebas kembali)
+// Admin batalkan peminjaman atas permintaan staf (Hapus permanen, slot langsung tersedia kembali)
 app.post("/api/admin/bookings/:id/cancel-by-staff", (req, res) => {
   if (!checkAdminAuth(req)) {
     return res.status(403).json({ error: "unauthorized", message: "Akses hanya untuk Admin Pengelola." });
   }
   withLock(() => {
-    const bookings = readBookings();
+    let bookings = readBookings();
     const idx = bookings.findIndex((b) => b.id === req.params.id);
     if (idx === -1) {
       return res.status(404).json({ error: "not_found", message: "Jadwal peminjaman tidak ditemukan." });
     }
-    const reason = (req.body && req.body.reason ? req.body.reason.trim() : "") || "Dibatalkan atas permintaan staf/pemohon";
-    bookings[idx].status = "dibatalkan";
-    bookings[idx].cancelledBy = "Staf";
-    bookings[idx].cancelReason = reason;
-    bookings[idx].cancelledAt = new Date().toISOString();
-
+    const removed = bookings.splice(idx, 1);
     writeBookings(bookings);
     res.json({
       success: true,
-      booking: bookings[idx],
-      message: "Jadwal berhasil dibatalkan atas permintaan staf. Ruangan sekarang kembali tersedia."
+      removed: removed[0],
+      message: "Jadwal peminjaman staf berhasil dihapus secara permanen. Ruangan sekarang kembali tersedia."
     });
   }).catch((err) => {
     console.error(err);

@@ -156,7 +156,7 @@
 
       var btnReject = document.createElement("button");
       btnReject.className = "btn-reject";
-      btnReject.innerHTML = "✕ Tolak";
+      btnReject.innerHTML = "✕ Tolak & Hapus";
       btnReject.addEventListener("click", function(){
         rejectBooking(b.id, b.roomName, b.requesterName);
       });
@@ -196,18 +196,16 @@
     });
   }
 
-  // Tolak Permintaan
+  // Tolak & Hapus Permintaan
   function rejectBooking(bookingId, roomName, requester) {
-    var reason = prompt("Masukkan alasan penolakan (opsional):", "Jadwal bertabrakan / Ruangan sedang dalam pemeliharaan");
-    if (reason === null) return; // Dibatalkan pengguna
+    if (!confirm("Apakah Anda yakin ingin menolak & menghapus jadwal peminjaman " + roomName + " untuk " + requester + "?\n\nSetelah dihapus, pengajuan ini tidak akan dimunculkan lagi dan ruangan kembali berstatus Tersedia.")) return;
 
     fetch("/api/admin/bookings/" + encodeURIComponent(bookingId) + "/reject", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "x-admin-token": adminToken
-      },
-      body: JSON.stringify({ reason: reason })
+      }
     })
     .then(function(res){
       return res.json().then(function(data){
@@ -216,7 +214,7 @@
       });
     })
     .then(function(){
-      showToast("Peminjaman telah ditolak.", "success");
+      showToast("Peminjaman berhasil ditolak dan dihapus secara permanen.", "success");
       loadAdminBookings();
     })
     .catch(function(err){
@@ -371,7 +369,7 @@
     btnDel.className = "btn btn-danger btn-sm";
     btnDel.textContent = "Hapus / Batalkan Jadwal";
     btnDel.addEventListener("click", function(){
-      if (!confirm("Apakah Anda yakin ingin membatalkan jadwal ini?")) return;
+      if (!confirm("Apakah Anda yakin ingin menghapus jadwal ini secara permanen?\n\nSetelah dihapus, data peminjaman tidak akan dimunculkan lagi dan slot ruangan akan kembali berstatus Tersedia.")) return;
       deleteBooking(b.id);
     });
     actions.appendChild(btnDel);
@@ -396,7 +394,7 @@
     })
     .then(function(){
       closeModal("modal-detail");
-      showToast("Peminjaman berhasil dihapus/dibatalkan.", "success");
+      showToast("Peminjaman berhasil dihapus secara permanen.", "success");
       loadAdminBookings();
     })
     .catch(function(err){
@@ -522,6 +520,77 @@
         closeModal("modal-change-pin");
         formChangePin.reset();
         showToast("PIN Admin berhasil diubah!", "success");
+      })
+      .catch(function(err){
+        showToast(err.message, "error");
+      });
+    });
+  }
+
+  // Handle Fitur "Pembatalan oleh Staf" (Hapus Permintaan / Jadwal Staf)
+  var btnCancelStaffModal = document.getElementById("btn-cancel-staff-modal");
+  var selectCancelBooking = document.getElementById("cancel-select-booking");
+  var formCancelStaff = document.getElementById("form-cancel-staff");
+
+  if (btnCancelStaffModal && selectCancelBooking) {
+    btnCancelStaffModal.addEventListener("click", function(){
+      selectCancelBooking.innerHTML = "<option value=''>-- Pilih Jadwal yang Akan Dibatalkan --</option>";
+      var activeBookings = bookingsData.filter(function(b){
+        return b && (b.status === "aktif" || b.status === "menunggu");
+      });
+
+      if (activeBookings.length === 0) {
+        showToast("Tidak ada jadwal peminjaman staf yang sedang aktif atau menunggu persetujuan.", "info");
+        return;
+      }
+
+      activeBookings.forEach(function(b){
+        var opt = document.createElement("option");
+        opt.value = b.id;
+        var roomLabel = ROOM_NAMES[b.roomId] || b.roomName || b.roomId;
+        var statusLabel = b.status === "menunggu" ? "[MENUNGGU] " : "";
+        opt.textContent = statusLabel + "[" + b.date + " - " + (b.session||"").toUpperCase() + "] " + roomLabel + " — " + b.requesterName + " (" + b.unit + ") - " + (b.purpose || "");
+        selectCancelBooking.appendChild(opt);
+      });
+
+      openModal("modal-cancel-staff");
+    });
+  }
+
+  if (formCancelStaff && selectCancelBooking) {
+    formCancelStaff.addEventListener("submit", function(e){
+      e.preventDefault();
+      var bId = selectCancelBooking.value;
+      if (!bId) {
+        showToast("Silakan pilih jadwal yang akan dibatalkan.", "error");
+        return;
+      }
+
+      if (!confirm("Apakah Anda yakin ingin membatalkan dan menghapus jadwal peminjaman staf ini?\n\nSetelah dihapus, data peminjaman tidak akan dimunculkan lagi dan ruangan kembali berstatus Tersedia.")) {
+        return;
+      }
+
+      var reason = document.getElementById("cancel-staff-reason") ? document.getElementById("cancel-staff-reason").value.trim() : "";
+
+      fetch("/api/admin/bookings/" + encodeURIComponent(bId) + "/cancel-by-staff", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-token": adminToken
+        },
+        body: JSON.stringify({ reason: reason })
+      })
+      .then(function(res){
+        return res.json().then(function(data){
+          if (!res.ok) throw new Error(data.message || "Gagal membatalkan peminjaman.");
+          return data;
+        });
+      })
+      .then(function(){
+        closeModal("modal-cancel-staff");
+        formCancelStaff.reset();
+        showToast("Peminjaman staf berhasil dibatalkan dan dihapus secara permanen.", "success");
+        loadAdminBookings();
       })
       .catch(function(err){
         showToast(err.message, "error");
