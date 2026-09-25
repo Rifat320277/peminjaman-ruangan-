@@ -165,20 +165,26 @@
       var dateStr = currentYear + "-" + pad2(currentMonth + 1) + "-" + pad2(d);
       var dayObj = new Date(currentYear, currentMonth, d);
       var dayOfWeek = dayObj.getDay();
-      var isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+      var isSunday = (dayOfWeek === 0);
+      var isSaturday = (dayOfWeek === 6);
+      var isWeekend = (isSunday || isSaturday);
       var isToday = (dateStr === todayStr);
       var dayName = DAY_NAMES[dayOfWeek];
 
       // Baris Sesi Pagi
       var trPagi = document.createElement("tr");
       trPagi.id = "row-date-" + dateStr;
-      if (isWeekend) trPagi.className = "weekend";
+      if (isWeekend) {
+        trPagi.className = "weekend";
+        if (isSaturday) trPagi.classList.add("saturday");
+        if (isSunday) trPagi.classList.add("sunday");
+      }
       if (isToday) trPagi.classList.add("today");
 
       var tdTgl = document.createElement("td");
       tdTgl.rowSpan = 2;
       tdTgl.className = "col-tgl";
-      tdTgl.innerHTML = "<strong>" + d + "</strong><div style='font-size:10px; color:#64748b;'>" + dayName + "</div>";
+      tdTgl.innerHTML = "<strong>" + d + "</strong><div style='font-size:10px; color:" + (isWeekend ? "#991b1b" : "#64748b") + "; font-weight:" + (isWeekend ? "800" : "normal") + ";'>" + dayName + "</div>";
       trPagi.appendChild(tdTgl);
 
       var tdWaktuPagi = document.createElement("td");
@@ -192,7 +198,11 @@
       // Baris Sesi Siang
       var trSiang = document.createElement("tr");
       trSiang.id = "row-date-" + dateStr + "-siang";
-      if (isWeekend) trSiang.className = "weekend";
+      if (isWeekend) {
+        trSiang.className = "weekend";
+        if (isSaturday) trSiang.classList.add("saturday");
+        if (isSunday) trSiang.classList.add("sunday");
+      }
       if (isToday) trSiang.classList.add("today");
 
       var tdWaktuSiang = document.createElement("td");
@@ -215,26 +225,35 @@
 
       if (booking) {
         tdKegiatan.className = "cell-booked";
-        tdKegiatan.colSpan = 2;
+        tdPJ.className = "cell-booked";
+
         if (booking.status === "menunggu") {
-          tdKegiatan.innerHTML = "<span class='badge-slot pending'>⏳ Menunggu Persetujuan</span>";
-          tdKegiatan.title = "Peminjaman sedang menunggu persetujuan admin.";
+          tdKegiatan.style.background = "#fef3c7";
+          tdPJ.style.background = "#fef3c7";
+          tdKegiatan.innerHTML = "<div class='admin-cell-content'><span style='color:#b45309; font-weight:700;'>⏳ [MENUNGGU]</span><span class='admin-cell-unit'>" + escapeHTML(booking.purpose || booking.unit || "-") + "</span></div>";
+          tdPJ.innerHTML = "<div class='admin-cell-pj'>" + escapeHTML(booking.requesterName || "-") + "<br><small style='color:#64748b;'>" + escapeHTML(booking.unit || "") + "</small></div>";
         } else {
-          tdKegiatan.innerHTML = "<span class='badge-slot booked'>🔒 Terisi / Booked</span>";
-          tdKegiatan.title = "Ruangan terisi pada sesi ini. Rincian dirahasiakan untuk privasi.";
+          tdKegiatan.innerHTML = "<div class='admin-cell-content'><span class='admin-cell-unit'>" + escapeHTML(booking.purpose || booking.unit || "-") + "</span></div>";
+          tdPJ.innerHTML = "<div class='admin-cell-pj'>" + escapeHTML(booking.requesterName || "-") + "<br><small style='color:#64748b;'>" + escapeHTML(booking.unit || "") + "</small></div>";
         }
-        tdKegiatan.addEventListener("click", function(){
-          showToast("Ruangan " + ROOM_NAMES[roomId] + " sudah terisi pada " + dateStr + " sesi " + session + ".", "error");
-        });
+
+        tdKegiatan.style.cursor = "pointer";
+        tdPJ.style.cursor = "pointer";
+        tdKegiatan.title = "Klik untuk melihat rincian — " + (ROOM_NAMES[roomId] || roomId);
+        tdPJ.title = "Klik untuk melihat rincian — " + (ROOM_NAMES[roomId] || roomId);
+        var showDetail = (function(b){ return function(){ showStaffBookingDetail(b); }; })(booking);
+        tdKegiatan.addEventListener("click", showDetail);
+        tdPJ.addEventListener("click", showDetail);
+
         tr.appendChild(tdKegiatan);
+        tr.appendChild(tdPJ);
       } else {
+        // Slot tersedia: tampilkan — tapi bisa diklik untuk mengajukan peminjaman
         tdKegiatan.className = "cell-empty";
         tdKegiatan.colSpan = 2;
         tdKegiatan.innerHTML = "<span class='badge-slot available'>✓ Tersedia</span>";
         tdKegiatan.title = "Klik untuk mengajukan peminjaman ruangan ini";
-        tdKegiatan.addEventListener("click", function(){
-          openFormForSlot(roomId, dateStr, session);
-        });
+        tdKegiatan.addEventListener("click", (function(rId, ds, sess){ return function(){ openFormForSlot(rId, ds, sess); }; })(roomId, dateStr, session));
         tr.appendChild(tdKegiatan);
       }
     });
@@ -415,6 +434,36 @@
   }
 
 
+  // Tampilkan Rincian Peminjaman di Modal (Mode Staf)
+  function showStaffBookingDetail(b) {
+    var title = document.getElementById("modal-detail-title");
+    var body = document.getElementById("modal-detail-body");
+    if (!title || !body) return;
+
+    var roomName = ROOM_NAMES[b.roomId] || b.roomName || b.roomId;
+    title.textContent = "Rincian Peminjaman — " + roomName;
+
+    var statusBadge = "<span class='badge-slot available' style='display:inline-flex; width:auto;'>✓ Disetujui / Terjadwal</span>";
+    if (b.status === "menunggu") {
+      statusBadge = "<span class='badge-slot pending' style='display:inline-flex; width:auto;'>⏳ Menunggu Persetujuan Admin</span>";
+    }
+
+    body.innerHTML =
+      "<div style='margin-bottom: 14px;'>" +
+        statusBadge +
+      "</div>" +
+      "<table style='width:100%; border:none; font-size:13px; line-height:1.8;'>" +
+        "<tr><td style='width:140px; color:#64748b; border:none; padding:4px 0;'>Ruangan:</td><td style='border:none; font-weight:700; color:#0f766e; padding:4px 0;'>" + escapeHTML(roomName) + "</td></tr>" +
+        "<tr><td style='color:#64748b; border:none; padding:4px 0;'>Tanggal:</td><td style='border:none; font-weight:600; padding:4px 0;'>" + escapeHTML(b.date) + " (" + escapeHTML((b.session||"").toUpperCase()) + ", " + escapeHTML(b.startTime||"") + " - " + escapeHTML(b.endTime||"") + " WIB)</td></tr>" +
+        "<tr><td style='color:#64748b; border:none; padding:4px 0;'>Agenda / Kegiatan:</td><td style='border:none; font-weight:700; color:#0f172a; padding:4px 0;'>" + escapeHTML(b.purpose || "-") + "</td></tr>" +
+        "<tr><td style='color:#64748b; border:none; padding:4px 0;'>Bidang / Unit:</td><td style='border:none; font-weight:600; padding:4px 0;'>" + escapeHTML(b.unit || "-") + "</td></tr>" +
+        "<tr><td style='color:#64748b; border:none; padding:4px 0;'>Penanggung Jawab:</td><td style='border:none; font-weight:600; padding:4px 0;'>" + escapeHTML(b.requesterName || "-") + "</td></tr>" +
+        (b.participants ? "<tr><td style='color:#64748b; border:none; padding:4px 0;'>Estimasi Peserta:</td><td style='border:none; padding:4px 0;'>" + escapeHTML(String(b.participants)) + " Orang</td></tr>" : "") +
+      "</table>";
+
+    openModal("modal-detail");
+  }
+
   // Tombol Pintas
   var btnQuickBook = document.getElementById("btn-quick-book");
   if (btnQuickBook) {
@@ -429,7 +478,7 @@
   var btnExportSpreadsheet = document.getElementById("btn-export-spreadsheet");
   if (btnExportSpreadsheet) {
     btnExportSpreadsheet.addEventListener("click", function(){
-      exportSpreadsheet(false, currentYear, currentMonth, bookingsData);
+      exportSpreadsheet(true, currentYear, currentMonth, bookingsData);
     });
   }
 

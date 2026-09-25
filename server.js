@@ -133,8 +133,7 @@ app.post("/api/admin/logout", (req, res) => {
 
 // ---------- BOOKINGS API ----------
 
-// Public / Staff Endpoint: SANITIZED DATA (Privacy Guaranteed!)
-// Returns only slots and status "terisi", NEVER leaking requesterName, phone, or purpose
+// Public / Staff Endpoint: Jadwal Lengkap & Transparan (Kegiatan & Penanggung Jawab)
 app.get("/api/bookings", (req, res) => {
   const isAdmin = checkAdminAuth(req);
   const bookings = readBookings();
@@ -144,8 +143,8 @@ app.get("/api/bookings", (req, res) => {
     return res.json(bookings);
   }
 
-  // If public / staff, sanitize every booking
-  const sanitized = bookings.map((b) => ({
+  // Tampilkan data jadwal peminjaman beserta penanggung jawab dan kegiatan/unit
+  const list = bookings.map((b) => ({
     id: b.id,
     roomId: b.roomId,
     roomName: b.roomName,
@@ -154,11 +153,14 @@ app.get("/api/bookings", (req, res) => {
     startTime: b.startTime,
     endTime: b.endTime,
     status: b.status,
-    isBooked: b.status === "aktif" || b.status === "menunggu"
-    // requesterName, unit, phone, purpose, participants are intentionally omitted!
+    isBooked: b.status === "aktif" || b.status === "menunggu",
+    purpose: b.purpose || "",
+    unit: b.unit || "",
+    requesterName: b.requesterName || "",
+    participants: b.participants || 0
   }));
 
-  res.json(sanitized);
+  res.json(list);
 });
 
 // Admin Endpoint: FULL DATA with all requester details

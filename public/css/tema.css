@@ -9,9 +9,15 @@
   --primary-tint: #f0fdfa;
   --accent: #d97706;
   --accent-tint: #fef3c7;
-  --weekend-bg: #fef9c3;
-  --weekend-border: #fef08a;
-  --weekend-text: #854d0e;
+  --weekend-bg: #fca5a5;
+  --weekend-border: #f87171;
+  --weekend-text: #7f1d1d;
+  --saturday-bg: #fca5a5;
+  --saturday-border: #f87171;
+  --saturday-text: #7f1d1d;
+  --sunday-bg: #fca5a5;
+  --sunday-border: #f87171;
+  --sunday-text: #7f1d1d;
   --ink: #0f172a;
   --ink-soft: #475569;
   --ink-faint: #94a3b8;
@@ -307,6 +313,6 @@ body {
   .sheet-container { border: 1px solid #000 !important; box-shadow: none !important; }
   .matrix-table { font-size: 9pt !important; }
   .matrix-table th, .matrix-table td { border: 1px solid #000 !important; padding: 4px !important; }
-  .matrix-table tbody tr.weekend { background-color: #fef08a !important; -webkit-print-color-adjust: exact; }
+  .matrix-table tbody tr.weekend, .matrix-table tbody tr.saturday, .matrix-table tbody tr.sunday { background-color: #fca5a5 !important; -webkit-print-color-adjust: exact; }
   .sheet-table-header-title { border-bottom: 2px solid #000 !important; padding: 8px !important; }
 }

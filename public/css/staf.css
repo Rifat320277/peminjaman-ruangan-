@@ -209,12 +209,53 @@
   padding: 6px 8px;
 }
 
-.matrix-table tbody tr.weekend {
-  background-color: var(--weekend-bg) !important;
+/* Hari Akhir Pekan (Sabtu & Minggu: Warna Merah Sedang untuk Staff & Admin) */
+.matrix-table tbody tr.weekend,
+.matrix-table tbody tr.saturday,
+.matrix-table tbody tr.sunday,
+.matrix-table tbody tr.weekend > td,
+.matrix-table tbody tr.saturday > td,
+.matrix-table tbody tr.sunday > td {
+  background-color: var(--weekend-bg, #fca5a5) !important;
+  border-color: #f87171 !important;
 }
-.matrix-table tbody tr.weekend td {
-  border-color: #fde047;
+.matrix-table tbody tr.weekend .col-tgl,
+.matrix-table tbody tr.saturday .col-tgl,
+.matrix-table tbody tr.sunday .col-tgl {
+  background-color: var(--weekend-bg, #fca5a5) !important;
 }
+.matrix-table tbody tr.weekend .col-tgl strong,
+.matrix-table tbody tr.saturday .col-tgl strong,
+.matrix-table tbody tr.sunday .col-tgl strong {
+  color: #7f1d1d !important;
+}
+.matrix-table tbody tr.weekend .col-tgl div,
+.matrix-table tbody tr.saturday .col-tgl div,
+.matrix-table tbody tr.sunday .col-tgl div {
+  color: #991b1b !important;
+  font-weight: 800 !important;
+}
+.matrix-table tbody tr.weekend .col-waktu.pagi,
+.matrix-table tbody tr.weekend .col-waktu.siang,
+.matrix-table tbody tr.saturday .col-waktu.pagi,
+.matrix-table tbody tr.saturday .col-waktu.siang,
+.matrix-table tbody tr.sunday .col-waktu.pagi,
+.matrix-table tbody tr.sunday .col-waktu.siang {
+  color: #7f1d1d !important;
+  font-weight: 800 !important;
+  background-color: var(--weekend-bg, #fca5a5) !important;
+}
+.matrix-table tbody tr.weekend td.cell-empty,
+.matrix-table tbody tr.saturday td.cell-empty,
+.matrix-table tbody tr.sunday td.cell-empty {
+  background-color: #fecaca !important;
+}
+.matrix-table tbody tr.weekend td.cell-empty:hover,
+.matrix-table tbody tr.saturday td.cell-empty:hover,
+.matrix-table tbody tr.sunday td.cell-empty:hover {
+  background-color: #fee2e2 !important;
+}
+
 .matrix-table tbody tr.today {
   box-shadow: inset 0 0 0 2px var(--primary-light);
 }
@@ -248,6 +289,38 @@
 .cell-booked {
   cursor: pointer;
   transition: background 0.15s;
+  vertical-align: top;
+  padding: 6px 8px !important;
+}
+.cell-booked:hover {
+  background-color: #f1f5f9 !important;
+}
+.matrix-table tbody tr.weekend .cell-booked:hover,
+.matrix-table tbody tr.saturday .cell-booked:hover,
+.matrix-table tbody tr.sunday .cell-booked:hover {
+  background-color: #fca5a5 !important;
+}
+
+/* Sel Tampilan Kegiatan & Penanggung Jawab */
+.schedule-cell-content,
+.admin-cell-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.schedule-cell-unit,
+.admin-cell-unit {
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.25;
+  font-size: 12px;
+}
+.schedule-cell-pj,
+.admin-cell-pj {
+  font-size: 11.5px;
+  color: #334155;
+  font-weight: 600;
+  line-height: 1.25;
 }
 
 /* Badge Status Peminjaman */

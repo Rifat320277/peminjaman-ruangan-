@@ -119,7 +119,7 @@ function exportSpreadsheet(fullDetails, currentYear, currentMonth, bookingsData)
     '.th-group { background-color: #CBD5E1; font-weight: bold; text-align: center; }' +
     '.th-room { background-color: #E2E8F0; font-weight: bold; text-align: center; font-size: 12pt; }' +
     '.th-sub { background-color: #F1F5F9; font-weight: bold; text-align: center; font-size: 12pt; }' +
-    '.weekend-bg { background-color: #FFFF00 !important; }' +
+    '.weekend-bg { background-color: #FCA5A5 !important; color: #7F1D1D !important; }' +
     '.text-center { text-align: center; }' +
     '.text-bold { font-weight: bold; }' +
     '</style>' +
@@ -161,7 +161,7 @@ function exportSpreadsheet(fullDetails, currentYear, currentMonth, bookingsData)
     var dateStr = currentYear + "-" + pad2(currentMonth + 1) + "-" + pad2(d);
     var dayOfWeek = new Date(currentYear, currentMonth, d).getDay();
     var isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
-    var cellBg = isWeekend ? ' style="background-color:#FFFF00;"' : '';
+    var cellBg = isWeekend ? ' style="background-color:#FCA5A5; color:#7F1D1D;"' : '';
 
     var pagiMap = (map[dateStr] && map[dateStr]["pagi"]) ? map[dateStr]["pagi"] : {};
     var siangMap = (map[dateStr] && map[dateStr]["siang"]) ? map[dateStr]["siang"] : {};
@@ -173,8 +173,8 @@ function exportSpreadsheet(fullDetails, currentYear, currentMonth, bookingsData)
     rooms.forEach(function(rId){
       var b = pagiMap[rId];
       if (b) {
-        var keg = fullDetails ? (b.purpose || b.unit || "-") : "Terisi";
-        var pj = fullDetails ? (b.requesterName || "-") : "Terisi";
+        var keg = b.purpose || b.unit || "-";
+        var pj = b.requesterName || "-";
         html += '<td' + cellBg + '>' + escapeHTML(keg) + '</td>';
         html += '<td' + cellBg + '>' + escapeHTML(pj) + '</td>';
       } else {
@@ -189,8 +189,8 @@ function exportSpreadsheet(fullDetails, currentYear, currentMonth, bookingsData)
     rooms.forEach(function(rId){
       var b = siangMap[rId];
       if (b) {
-        var keg = fullDetails ? (b.purpose || b.unit || "-") : "Terisi";
-        var pj = fullDetails ? (b.requesterName || "-") : "Terisi";
+        var keg = b.purpose || b.unit || "-";
+        var pj = b.requesterName || "-";
         html += '<td' + cellBg + '>' + escapeHTML(keg) + '</td>';
         html += '<td' + cellBg + '>' + escapeHTML(pj) + '</td>';
       } else {

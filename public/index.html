@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/tema.css?v=3.0">
-<link rel="stylesheet" href="css/staf.css?v=3.0">
+<link rel="stylesheet" href="css/tema.css?v=4.0">
+<link rel="stylesheet" href="css/staf.css?v=4.0">
 </head>
 <body>
 
@@ -142,11 +142,11 @@
       </div>
     </div>
 
-    <!-- Informasi Kebijakan Privasi Staf -->
+    <!-- Informasi Keterangan Jadwal & Legenda Warna -->
     <div class="privacy-info-box" id="privacy-box-staff">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
       <div>
-        <strong>Kebijakan Privasi Peminjaman:</strong> Pada tampilan Staf / Publik, sistem hanya menampilkan status ketersediaan (<em>Tersedia</em> / <em>Terisi</em>) demi menjaga privasi dan ketertiban. Rincian peminjam dapat dipantau oleh <strong>Admin Pengelola Ruangan</strong> di <a href="admin.html" style="color:#0f766e; font-weight:700; text-decoration:underline;">Portal Admin</a>. Baris berwarna kuning menandakan akhir pekan (Sabtu &amp; Minggu).
+        <strong>Keterangan Jadwal &amp; Warna:</strong> Menampilkan agenda kegiatan dan penanggung jawab ruangan secara transparan. Baris berwarna <span style="background:#fca5a5; color:#7f1d1d; font-weight:800; padding:2px 7px; border-radius:4px; border:1px solid #f87171;">merah</span> menandakan hari libur akhir pekan (<strong>Sabtu &amp; Minggu</strong>). Klik pada slot <em>✓ Tersedia</em> untuk mengajukan peminjaman, atau klik pada jadwal terisi untuk melihat detail.
       </div>
     </div>
 
@@ -259,6 +259,22 @@
 
 </main>
 
+<!-- MODAL: DETAIL BOOKING STAF -->
+<div class="modal-backdrop" id="modal-detail">
+  <div class="modal-dialog">
+    <div class="modal-head">
+      <h3 id="modal-detail-title">Rincian Peminjaman Ruangan</h3>
+      <button class="modal-close" data-close>&times;</button>
+    </div>
+    <div class="modal-body" id="modal-detail-body">
+      <!-- Injected detail info -->
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn btn-secondary" data-close>Tutup</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: RESI TIKET PENGAJUAN -->
 <div class="modal-backdrop" id="modal-receipt">
   <div class="modal-dialog" style="max-width: 480px;">
@@ -282,8 +298,8 @@
 <div class="toast-container" id="toast-container"></div>
 
 <!-- Skrip Terpisah -->
-<script src="js/utilitas.js?v=3.0"></script>
-<script src="js/staf.js?v=3.0"></script>
+<script src="js/utilitas.js?v=4.0"></script>
+<script src="js/staf.js?v=4.0"></script>
 
 </body>
 </html>

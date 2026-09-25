@@ -253,20 +253,26 @@
       var dateStr = currentYear + "-" + pad2(currentMonth + 1) + "-" + pad2(d);
       var dayObj = new Date(currentYear, currentMonth, d);
       var dayOfWeek = dayObj.getDay();
-      var isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+      var isSunday = (dayOfWeek === 0);
+      var isSaturday = (dayOfWeek === 6);
+      var isWeekend = (isSunday || isSaturday);
       var isToday = (dateStr === todayStr);
       var dayName = DAY_NAMES[dayOfWeek];
 
       // Baris Sesi Pagi
       var trPagi = document.createElement("tr");
       trPagi.id = "row-date-" + dateStr;
-      if (isWeekend) trPagi.className = "weekend";
+      if (isWeekend) {
+        trPagi.className = "weekend";
+        if (isSaturday) trPagi.classList.add("saturday");
+        if (isSunday) trPagi.classList.add("sunday");
+      }
       if (isToday) trPagi.classList.add("today");
 
       var tdTgl = document.createElement("td");
       tdTgl.rowSpan = 2;
       tdTgl.className = "col-tgl";
-      tdTgl.innerHTML = "<strong>" + d + "</strong><div style='font-size:10px; color:#64748b;'>" + dayName + "</div>";
+      tdTgl.innerHTML = "<strong>" + d + "</strong><div style='font-size:10px; color:" + (isWeekend ? "#991b1b" : "#64748b") + "; font-weight:" + (isWeekend ? "800" : "normal") + ";'>" + dayName + "</div>";
       trPagi.appendChild(tdTgl);
 
       var tdWaktuPagi = document.createElement("td");
@@ -280,7 +286,11 @@
       // Baris Sesi Siang
       var trSiang = document.createElement("tr");
       trSiang.id = "row-date-" + dateStr + "-siang";
-      if (isWeekend) trSiang.className = "weekend";
+      if (isWeekend) {
+        trSiang.className = "weekend";
+        if (isSaturday) trSiang.classList.add("saturday");
+        if (isSunday) trSiang.classList.add("sunday");
+      }
       if (isToday) trSiang.classList.add("today");
 
       var tdWaktuSiang = document.createElement("td");
