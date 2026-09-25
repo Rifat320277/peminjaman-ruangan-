@@ -82,7 +82,7 @@ function writeBookings(bookings) {
 let writeLock = Promise.resolve();
 function withLock(fn) {
   const result = writeLock.then(fn);
-  writeLock = result.catch(() => {});
+  writeLock = result.catch(() => { });
   return result;
 }
 
@@ -407,13 +407,13 @@ app.delete("/api/admin/bookings/:id", (req, res) => {
 app.post("/api/admin/approve-booking", (req, res) => {
   const { bookingId } = req.body || {};
   req.params.id = bookingId;
-  return app._router.handle(req, res, () => {});
+  return app._router.handle(req, res, () => { });
 });
 
 app.post("/api/admin/reject-booking", (req, res) => {
   const { bookingId } = req.body || {};
   req.params.id = bookingId;
-  return app._router.handle(req, res, () => {});
+  return app._router.handle(req, res, () => { });
 });
 
 app.post("/api/admin/cancel-booking", (req, res) => {
@@ -463,7 +463,7 @@ app.post("/api/admin/bookings/:id/cancel-by-staff", (req, res) => {
 app.post("/api/admin/cancel-by-staff", (req, res) => {
   const { bookingId } = req.body || {};
   req.params.id = bookingId;
-  return app._router.handle(req, res, () => {});
+  return app._router.handle(req, res, () => { });
 });
 
 // Staff Verify / Track own booking by Booking ID or Phone
@@ -473,8 +473,8 @@ app.get("/api/bookings/my-check", (req, res) => {
     return res.json([]);
   }
   const bookings = readBookings();
-  const matched = bookings.filter((b) => 
-    b.id.toLowerCase() === query || 
+  const matched = bookings.filter((b) =>
+    b.id.toLowerCase() === query ||
     (b.phone && b.phone.replace(/[^0-9]/g, "") === query.replace(/[^0-9]/g, ""))
   );
   // Return matched bookings for the owner
@@ -485,3 +485,4 @@ app.get("/api/bookings/my-check", (req, res) => {
 app.listen(PORT, "0.0.0.0", () => {
   console.log("Sistem Peminjaman Ruangan Dinkes Gresik berjalan di port " + PORT);
 });
+
