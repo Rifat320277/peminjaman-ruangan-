@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "id": "BK-20260901-M02K",
+    "roomId": "hypocrates",
+    "roomName": "HYPOCRATES",
+    "requesterName": "effe",
+    "unit": "dfe",
+    "phone": "-",
+    "participants": 1,
+    "date": "2026-09-01",
+    "session": "pagi",
+    "startTime": "07:30",
+    "endTime": "12:00",
+    "startDateTime": "2026-09-01T07:30",
+    "purpose": "efe",
+    "notes": "fee",
+    "status": "menunggu",
+    "createdAt": "2026-09-25T08:25:29.109Z"
+  }
+]

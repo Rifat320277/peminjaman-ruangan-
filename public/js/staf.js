@@ -458,7 +458,7 @@
         "<tr><td style='color:#64748b; border:none; padding:4px 0;'>Agenda / Kegiatan:</td><td style='border:none; font-weight:700; color:#0f172a; padding:4px 0;'>" + escapeHTML(b.purpose || "-") + "</td></tr>" +
         "<tr><td style='color:#64748b; border:none; padding:4px 0;'>Bidang / Unit:</td><td style='border:none; font-weight:600; padding:4px 0;'>" + escapeHTML(b.unit || "-") + "</td></tr>" +
         "<tr><td style='color:#64748b; border:none; padding:4px 0;'>Penanggung Jawab:</td><td style='border:none; font-weight:600; padding:4px 0;'>" + escapeHTML(b.requesterName || "-") + "</td></tr>" +
-        (b.participants ? "<tr><td style='color:#64748b; border:none; padding:4px 0;'>Estimasi Peserta:</td><td style='border:none; padding:4px 0;'>" + escapeHTML(String(b.participants)) + " Orang</td></tr>" : "") +
+        (b.notes ? "<tr><td style='color:#64748b; border:none; padding:4px 0;'>Catatan Tambahan:</td><td style='border:none; padding:4px 0; font-style:italic;'>" + escapeHTML(b.notes) + "</td></tr>" : "") +
       "</table>";
 
     openModal("modal-detail");
