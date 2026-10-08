@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  web-peminjaman:
+    build: .
+    container_name: peminjaman-ruangan-app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - DB_TYPE=mysql
+      - DB_HOST=host.docker.internal
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=
+      - DB_NAME=peminjaman_ruangan
+    env_file:
+      - .env

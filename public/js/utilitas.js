@@ -131,7 +131,7 @@ function exportSpreadsheet(fullDetails, currentYear, currentMonth, bookingsData)
     '<tr><td colspan="8" style="border:none; height:8px;"></td></tr>' +
     '<tr><td colspan="8" class="sub-note"><strong>Bulan ' + monthName + ' ' + currentYear + '</strong></td></tr>' +
     '<tr><td colspan="8" class="sub-note">Waktu Penggunaan: Pagi, Siang, dan Seharian</td></tr>' +
-    '<tr><td colspan="8" class="sub-note">NB: Peminjaman Ruangan dapat menghubungi Mbak Lisa dan Mas Mudzakir</td></tr>' +
+    '<tr><td colspan="8" class="sub-note">NB: Peminjaman Ruangan dapat menghubungi Mbak Lisa</td></tr>' +
     '<tr><td colspan="8" style="border:none; height:8px;"></td></tr>' +
     '<thead>' +
     '<tr>' +
