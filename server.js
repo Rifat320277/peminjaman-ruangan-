@@ -394,8 +394,9 @@ async function startServer() {
   await db.initDatabase();
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`🚀 Sistem Peminjaman Ruangan Dinkes Gresik berjalan di port ${82}`);
-    console.log(`🌐 Buka di browser: http://localhost:${82}`);
+    console.log(`🚀 Sistem Peminjaman Ruangan Dinkes Gresik berjalan di port ${PORT}`);
+    console.log(`🌐 Buka di browser: http://localhost:${PORT}`);
+    console.log(`💾 Mode Database: ${db.isMySQLActive() ? "MySQL / MariaDB" : "Berkas JSON Lokal (data/bookings.json)"}`);
   });
 }
 

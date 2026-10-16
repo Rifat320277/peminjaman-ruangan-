@@ -66,8 +66,13 @@ function writeJsonBookings(bookings) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
     }
     fs.writeFileSync(DATA_FILE, JSON.stringify(bookings, null, 2), "utf8");
+    return true;
   } catch (err) {
-    console.warn("Gagal menyimpan ke file JSON:", err.message);
+    console.error("❌ Gagal menyimpan ke berkas JSON data/bookings.json:", err.message);
+    if (err.code === "EACCES" || err.code === "EPERM") {
+      console.error("👉 Masalah izin berkas (Permission Denied) di NAS/Linux. Jalankan perintah: chmod -R 777 data");
+    }
+    throw new Error("Gagal menyimpan data ke berkas lokal: " + err.message);
   }
 }
 
@@ -89,8 +94,10 @@ function saveJsonAdminPin(newPin) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
     }
     fs.writeFileSync(ADMIN_PIN_FILE, JSON.stringify({ pin: newPin }, null, 2), "utf8");
+    return true;
   } catch (e) {
-    console.warn("Gagal menyimpan PIN ke file:", e.message);
+    console.error("❌ Gagal menyimpan PIN ke file:", e.message);
+    throw new Error("Gagal menyimpan PIN ke berkas: " + e.message);
   }
 }
 
@@ -110,16 +117,23 @@ async function initDatabase() {
   const database = process.env.DB_NAME || "peminjaman_ruangan";
 
   try {
-    // 1. Buat koneksi awal untuk memastikan database telah ada (CREATE DATABASE IF NOT EXISTS)
-    const initConn = await mysql.createConnection({
-      host,
-      port,
-      user,
-      password
-    });
+    // 1. Coba inisialisasi database jika belum ada (jika user memiliki izin CREATE DATABASE)
+    try {
+      const initConn = await mysql.createConnection({
+        host,
+        port,
+        user,
+        password,
+        connectTimeout: 5000
+      });
 
-    await initConn.query(`CREATE DATABASE IF NOT EXISTS \`${database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`);
-    await initConn.end();
+      await initConn.query(`CREATE DATABASE IF NOT EXISTS \`${database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`);
+      await initConn.end();
+    } catch (createErr) {
+      // Pada NAS atau user MariaDB non-root, izin CREATE DATABASE mungkin dibatasi.
+      // Kita lanjutkan mencoba koneksi langsung ke database yang sudah dibuat.
+      console.log(`ℹ️ Catatan database (${createErr.message || createErr.code}), mencoba koneksi langsung ke '${database}'...`);
+    }
 
     // 2. Buat Connection Pool ke database peminjaman_ruangan
     pool = mysql.createPool({
@@ -131,6 +145,7 @@ async function initDatabase() {
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0,
+      connectTimeout: 10000,
       dateStrings: true
     });
 
@@ -241,9 +256,12 @@ async function initDatabase() {
   } catch (err) {
     isUsingMySQL = false;
     const msg = err ? (err.message || err.code || String(err)) : "Koneksi ditolak/offline";
-    console.warn(`⚠️ Peringatan: Tidak dapat terhubung ke MySQL (${msg}).`);
-    console.warn(`👉 Sistem otomatis menggunakan fallback berkas JSON lokal (data/bookings.json).`);
-    console.warn(`👉 Pastikan MySQL (misal XAMPP / Laragon / Service MySQL) aktif jika ingin menggunakan MySQL.`);
+    console.warn(`⚠️ Peringatan: Tidak dapat terhubung ke MySQL/MariaDB (${msg}).`);
+    console.warn(`👉 Sistem beralih ke penyimpanan berkas lokal: data/bookings.json`);
+    console.warn(`💡 Panduan Konfigurasi Database untuk NAS:`);
+    console.warn(`   1. Port MariaDB: Synology MariaDB 10 default menggunakan port 3307 (bukan 3306). Atur DB_PORT di berkas .env.`);
+    console.warn(`   2. Host Database: Jika dijalankan di dalam Docker, gunakan IP NAS atau 'host.docker.internal', jangan gunakan '127.0.0.1'.`);
+    console.warn(`   3. Pastikan database '${database}' sudah dibuat di phpMyAdmin / MariaDB NAS.`);
   }
 }
 

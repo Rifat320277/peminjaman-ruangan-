@@ -6,14 +6,10 @@ services:
     container_name: peminjaman-ruangan-app
     restart: always
     ports:
-      - "3000:3000"
-    environment:
-      - PORT=3000
-      - DB_TYPE=mysql
-      - DB_HOST=host.docker.internal
-      - DB_PORT=3306
-      - DB_USER=root
-      - DB_PASSWORD=
-      - DB_NAME=peminjaman_ruangan
+      - "${PORT:-82}:${PORT:-82}"
+    volumes:
+      - ./data:/app/data
     env_file:
       - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
